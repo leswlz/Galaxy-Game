@@ -9,8 +9,6 @@ class MainWidget(Widget):
     perspective_point_x = NumericProperty(0)
     perspective_point_y = NumericProperty(0)
 
-    # test line 3
-
     V_NB_LINES = 7 # 3 on the left, 3 on the right
     V_LINES_SPACING = .1 # 10 percent of the screen
     vertical_lines = []
