@@ -9,12 +9,12 @@ class MainWidget(Widget):
     perspective_point_x = NumericProperty(0)
     perspective_point_y = NumericProperty(0)
 
-    V_NB_LINES = 4 # number of vertical lines
-    V_LINES_SPACING = .1 # percentage of the screen width
+    V_NB_LINES = 10 # number of vertical lines
+    V_LINES_SPACING = .25 # percentage of the screen width
     vertical_lines = []
 
-    H_NB_LINES = 4 # number of horizontal lines
-    H_LINES_SPACING = .2 # percentage of the screen height
+    H_NB_LINES = 15 # number of horizontal lines
+    H_LINES_SPACING = .1 # percentage of the screen height
     horizontal_lines = []
 
     def __init__(self, **kwargs):
@@ -68,32 +68,39 @@ class MainWidget(Widget):
                 self.horizontal_lines.append(Line())
 
     def update_horizontal_lines(self):
-        xmin = 0
-        xmax = self.width
+        center_line_x = int(self.width / 2)
+        spacing = self.V_LINES_SPACING * self.width
+        offset = int(self.V_NB_LINES/2) - 0.5
+
+        xmin = center_line_x - offset * spacing
+        xmax = center_line_x + offset * spacing
+        spacing_y = self.H_LINES_SPACING * self.height
 
         for i in range(0, self.H_NB_LINES):
-            line_y = i * self.H_LINES_SPACING * self.height
+            line_y = i * spacing_y
             x1, y1 = self.transform(xmin, line_y)
             x2, y2 = self.transform(xmax, line_y)
             self.horizontal_lines[i].points = [x1, y1, x2, y2]
 
     def transform(self, x, y):
-        return self.transform_2D(x, y)
-        # return self.transform_perspective(x, y)
+        # return self.transform_2D(x, y)
+        return self.transform_perspective(x, y)
 
     def transform_2D(self, x, y):
         return int(x), int(y)
 
     def transform_perspective(self, x, y):
-        tr_y = y * self.perspective_point_y / self.height
-        if tr_y > self.perspective_point_y:
-            tr_y = self.perspective_point_y
+        lin_y = y * self.perspective_point_y / self.height
+        if lin_y > self.perspective_point_y:
+            lin_y = self.perspective_point_y
 
         diff_x = x - self.perspective_point_x
-        diff_y = self.perspective_point_y - tr_y
-        proportion_y = diff_y / self.perspective_point_y # 1 when diff_y == self.perspective_point_y / 0 when diff_y = 0
+        diff_y = self.perspective_point_y - lin_y
+        factor_y = diff_y / self.perspective_point_y # 1 when diff_y == self.perspective_point_y / 0 when diff_y = 0
+        factor_y = pow(factor_y, 4)
 
-        tr_x = self.perspective_point_x + diff_x * proportion_y
+        tr_x = self.perspective_point_x + diff_x * factor_y
+        tr_y = self.perspective_point_y - factor_y * self.perspective_point_y
 
         return int(tr_x), int(tr_y)
 
