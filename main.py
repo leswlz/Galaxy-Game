@@ -24,7 +24,8 @@ class MainWidget(Widget):
     SPEED = 4
     current_offset_y = 0
 
-    SPEED_X = 3
+    SPEED_X = 12
+    current_speed_x = 0
     current_offset_x = 0
 
     def __init__(self, **kwargs):
@@ -116,6 +117,15 @@ class MainWidget(Widget):
 
         return int(tr_x), int(tr_y)
 
+    def on_touch_down(self, touch):
+        if touch.x < self.width / 2:
+            self.current_speed_x = self.SPEED_X # moving to the left
+        else:
+            self.current_speed_x = -self.SPEED_X # moving to the right
+
+    def on_touch_up(self, touch):
+        self.current_speed_x = 0
+
     def update(self, dt):
         # print("dt: " + str(dt * 60))
         time_factor = dt * 60
@@ -127,7 +137,7 @@ class MainWidget(Widget):
         if self.current_offset_y >= spacing_y:
             self.current_offset_y -= spacing_y
 
-        self.current_offset_x += self.SPEED_X * time_factor
+        self.current_offset_x += self.current_speed_x * time_factor
 
 class GalaxyApp(App):
     pass
