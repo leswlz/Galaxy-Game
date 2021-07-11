@@ -18,12 +18,12 @@ class MainWidget(Widget):
     perspective_point_x = NumericProperty(0)
     perspective_point_y = NumericProperty(0)
 
-    V_NB_LINES = 4 # number of vertical lines
-    V_LINES_SPACING = .1 # percentage of the screen width
+    V_NB_LINES = 4  # number of vertical lines
+    V_LINES_SPACING = .1  # percentage of the screen width
     vertical_lines = []
 
-    H_NB_LINES = 15 # number of horizontal lines
-    H_LINES_SPACING = .1 # percentage of the screen height
+    H_NB_LINES = 15  # number of horizontal lines
+    H_LINES_SPACING = .1  # percentage of the screen height
     horizontal_lines = []
 
     SPEED = 1
@@ -34,7 +34,7 @@ class MainWidget(Widget):
     current_speed_x = 0
     current_offset_x = 0
 
-    NB_TILES = 8 # number of tiles
+    NB_TILES = 4  # number of tiles
     tiles = []
     tiles_coordinates = []
 
@@ -65,13 +65,24 @@ class MainWidget(Widget):
                 self.tiles.append(Quad())
 
     def generate_tiles_coordinates(self):
-        for i in range(0, self.NB_TILES):
-            self.tiles_coordinates.append((0, i))
+        last_y = 0
+
+        for i in range(len(self.tiles_coordinates) - 1, -1, -1):
+            if self.tiles_coordinates[i][1] < self.current_y_loop:
+                del self.tiles_coordinates[i]
+
+        if len(self.tiles_coordinates) > 0:
+            last_coordinates = self.tiles_coordinates[-1]
+            last_y = last_coordinates[1] + 1
+
+        for i in range(len(self.tiles_coordinates), self.NB_TILES):
+            self.tiles_coordinates.append((0, last_y))
+            last_y += 1
 
     def init_vertical_lines(self):
         with self.canvas:
             Color(1, 1, 1)
-            #self.line = Line(points=[100, 0, 100, 100])
+            # self.line = Line(points=[100, 0, 100, 100])
             for i in range(0, self.V_NB_LINES):
                 self.vertical_lines.append(Line())
 
@@ -146,8 +157,10 @@ class MainWidget(Widget):
         if self.current_offset_y >= spacing_y:
             self.current_offset_y -= spacing_y
             self.current_y_loop += 1
+            self.generate_tiles_coordinates()
 
         # self.current_offset_x += self.current_speed_x * time_factor
+
 
 class GalaxyApp(App):
     pass
